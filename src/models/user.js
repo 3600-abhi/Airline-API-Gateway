@@ -1,4 +1,8 @@
 'use strict';
+
+const bcrypt = require('bcrypt');
+const { ServerConfig } = require('../config');
+
 const {
   Model
 } = require('sequelize');
@@ -33,5 +37,20 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'User',
   });
+
+  // Adding hooks (triggers) for encrypting password before inserting in inside table 
+  User.beforeCreate(function encrypt(user) {
+    // user is the javascript object which is going to be inserted in table
+    // user: {email: 'abc@gmail.com', password: '123456'}
+    
+    // convert it to number because by default it will be string
+    const saltoRounds = parseInt(ServerConfig.SALT_ROUNDS);
+
+    const encryptedPassword = bcrypt.hashSync(user.password, saltoRounds);
+
+    user.password = encryptedPassword;
+  });
+
+
   return User;
 };
