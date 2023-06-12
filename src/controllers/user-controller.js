@@ -7,15 +7,32 @@ const { SuccessResponse, ErrorResponse } = require('../utils/common');
  * /signup
  * req.body: {email: 'xyz@gmail.com', password: 'ndvyue8765'}
 */
-async function createUser(req, res) {
+async function signup(req, res) {
     try {
-        const user = await UserService.createUser({
+        const user = await UserService.signup({
             email: req.body.email,
             password: req.body.password
         });
 
         SuccessResponse.data = user;
-        SuccessResponse.message = "Successfully created a user";
+        SuccessResponse.message = 'Successfully created a user';
+
+        return res.status(StatusCodes.OK).json(SuccessResponse);
+    } catch (error) {
+        ErrorResponse.error = error; // this error object is (AppError) object
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(ErrorResponse);
+    }
+}
+
+async function signin(req, res) {
+    try {
+        const response = await UserService.signin({
+            email: req.body.email,
+            password: req.body.password
+        });
+
+        SuccessResponse.message = 'Successfully signed in';
+        SuccessResponse.data = response;
 
         return res.status(StatusCodes.OK).json(SuccessResponse);
     } catch (error) {
@@ -25,5 +42,6 @@ async function createUser(req, res) {
 }
 
 module.exports = {
-    createUser
+    signup,
+    signin
 };

@@ -44,13 +44,13 @@ module.exports = (sequelize, DataTypes) => {
     // user: {email: 'abc@gmail.com', password: '123456'}
     
     // convert it to number because by default it will be string
-    const saltoRounds = parseInt(ServerConfig.SALT_ROUNDS);
+    const saltRounds = parseInt(ServerConfig.SALT_ROUNDS);
 
-    const encryptedPassword = bcrypt.hashSync(user.password, saltoRounds);
+    const encryptedPassword = bcrypt.hashSync(user.password, saltRounds);
 
     user.password = encryptedPassword;
   });
-
+ 
 
   return User;
 };
