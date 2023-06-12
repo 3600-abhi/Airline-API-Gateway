@@ -1,6 +1,7 @@
 const express = require('express');
 const { UserMiddlewares } = require('../../middlewares');
 const { UserController } = require('../../controllers');
+const { StatusCodes } = require('http-status-codes');
 
 const router = express.Router();
 
@@ -23,5 +24,13 @@ router.get(
     UserMiddlewares.validateSigninRequest,
     UserController.signin
 );
+
+
+// demo routes
+router.get('/demo', UserMiddlewares.validateUser, function(req, res) {
+    return res.status(StatusCodes.OK).json({
+        data: 'Kitna data chahida vuruu'
+    });
+});
 
 module.exports = router;
