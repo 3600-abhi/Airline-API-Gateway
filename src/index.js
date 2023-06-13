@@ -1,5 +1,6 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const { ServerConfig } = require('./config');
 const apiRoutes = require('./routes');
 
@@ -16,6 +17,20 @@ const limiter = rateLimit({
 
 // Enabling the Rate limiter
 app.use(limiter);
+
+
+// Implementing Reverse-Proxy for Flight-Services
+app.use(
+  '/flightservice',
+  createProxyMiddleware({ target: ServerConfig.FLIGHT_SERVICE, changeOrigin: true })
+);
+
+
+// Implementing Reverse-Proxy for Boking-Services
+app.use(
+  '/bookingservice',
+  createProxyMiddleware({ target: ServerConfig.BOOKING_SERVICE, changeOrigin: true })
+);
 
 
 app.use('/api', apiRoutes);
