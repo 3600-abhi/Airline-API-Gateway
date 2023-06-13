@@ -1,16 +1,21 @@
 const { StatusCodes } = require('http-status-codes');
 const bcrypt = require('bcrypt');
-const { UserRepository } = require('../repositories');
+const { UserRepository, RoleRepository } = require('../repositories');
 const AppError = require('../utils/errors/app-errors');
-const { Auth } = require('../utils/common');
+const { Auth, Enums } = require('../utils/common');
 
 
 const userRepository = new UserRepository();
-
+const roleRepository = new RoleRepository();
 
 async function signup(data) {
     try {
         const user = await userRepository.create(data);
+        const role = await roleRepository.getRoleByName(Enums.USER_ROLES.CUSTOMER);
+
+        // This is the Lazy loading concept of sequelize association (refer docs)
+        user.addRole(role);
+
         return user;
     } catch (error) {
         if (error.name === "SequelizeValidationError" || error.name === "SequelizeUniqueConstraintError") {
