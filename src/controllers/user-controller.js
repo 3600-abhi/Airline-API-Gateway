@@ -41,7 +41,26 @@ async function signin(req, res) {
     }
 }
 
+
+async function addRoleToUser(req, res) {
+    try {
+        const user = await UserService.addRoleToUser({
+            userId: req.body.userId,
+            role: req.body.role
+        });
+
+        SuccessResponse.data = user;
+        SuccessResponse.message = 'Succesfully added role to user';
+
+        return res.status(StatusCodes.OK).json(SuccessResponse);
+    } catch (error) {
+        ErrorResponse.error = error; // this error object is (AppError) object
+        return res.status(error.statusCode).json(ErrorResponse);
+    }
+}
+
 module.exports = {
     signup,
-    signin
+    signin,
+    addRoleToUser
 };

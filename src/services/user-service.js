@@ -11,10 +11,12 @@ const roleRepository = new RoleRepository();
 async function signup(data) {
     try {
         const user = await userRepository.create(data);
-        const role = await roleRepository.getRoleByName(Enums.USER_ROLES.CUSTOMER);
+
+        const customerRole = await roleRepository.getRoleByName(Enums.USER_ROLES.CUSTOMER);
 
         // This is the Lazy loading concept of sequelize association (refer docs)
-        user.addRole(role);
+        // by default the role of user will be customer after that admin can only set their roles
+        user.addRole(customerRole);
 
         return user;
     } catch (error) {
@@ -66,8 +68,6 @@ async function isAuthenticated(token) {
 
         const response = Auth.verifyToken(token);
 
-        console.log('Response = ', response);
-
         // Just checking it into database for more safety, just to safe from hacking
         // Although not much needed, we can avoide it 
         const user = await userRepository.get(response.id);
@@ -92,10 +92,64 @@ async function isAuthenticated(token) {
 }
 
 
+async function addRoleToUser(data) {
+    try {
+        const user = await userRepository.get(data.userId);
+
+        if (!user) {
+            throw new AppError('User not found for given Id', StatusCodes.NOT_FOUND);
+        }
+
+        const role = await roleRepository.getRoleByName(data.role);
+
+        if (!role) {
+            throw new AppError('Role not found for given name', StatusCodes.NOT_FOUND);
+        }
+
+        // This is the Lazy loading concept of sequelize association (refer docs)
+        user.addRole(role);
+
+        return user;
+    } catch (error) {
+        if (error instanceof AppError) {
+            throw error;
+        }
+
+        throw new AppError('Cannot change the user role', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
+
+
+async function isAdmin(id) {
+    try {
+        const user = await userRepository.get(id);
+
+        if (!user) {
+            throw new AppError('User not found for given Id', StatusCodes.NOT_FOUND);
+        }
+
+        const adminRole = await roleRepository.getRoleByName(Enums.USER_ROLES.ADMIN);
+
+        if (!adminRole) {
+            throw new AppError('Role not found for given name', StatusCodes.NOT_FOUND);
+        }
+
+        return user.hasRole(adminRole);
+
+    } catch (error) {
+        if (error instanceof AppError) {
+            throw error;
+        }
+
+        throw new AppError('Cannot verify the admin role', StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+}
 
 
 module.exports = {
     signup,
     signin,
-    isAuthenticated
+    isAuthenticated,
+    addRoleToUser,
+    isAdmin
 }

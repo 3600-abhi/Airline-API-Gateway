@@ -11,8 +11,8 @@ app.use(express.urlencoded({ extended: true }));
 
 
 const limiter = rateLimit({
-  windowMs: 2 * 60 * 1000, // 2 minutes
-  max: 3, // Limit each IP to 3 requests per `window` (here, per 3 minutes)
+  windowMs: 10 * 60 * 1000, // 2 minutes
+  max: 100, // Limit each IP to 3 requests per `window` (here, per 3 minutes)
 });
 
 // Enabling the Rate limiter

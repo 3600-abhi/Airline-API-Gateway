@@ -1,7 +1,8 @@
 const express = require('express');
+const { StatusCodes } = require('http-status-codes');
 const { UserMiddlewares } = require('../../middlewares');
 const { UserController } = require('../../controllers');
-const { StatusCodes } = require('http-status-codes');
+
 
 const router = express.Router();
 
@@ -26,11 +27,25 @@ router.get(
 );
 
 
+/** 
+ * PATCH: /api/v1/users/role
+*/
+router.post(
+    '/role',
+    UserMiddlewares.validateAddRoleToUserRequest,
+    UserMiddlewares.validateUser,
+    UserMiddlewares.isAdmin,
+    UserController.addRoleToUser
+);
+
+
 // demo routes
-router.get('/demo', UserMiddlewares.validateUser, function(req, res) {
+router.get('/demo', UserMiddlewares.validateUser, function (req, res) {
     return res.status(StatusCodes.OK).json({
-        data: 'Kitna data chahida vuruu'
+        data: 'Kitna demo chahida vuruu'
     });
 });
+
+
 
 module.exports = router;

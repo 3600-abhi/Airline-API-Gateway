@@ -54,6 +54,27 @@ function validateSigninRequest(req, res, next) {
     next();
 }
 
+function validateAddRoleToUserRequest(req, res, next) {
+    if (req.body.userId === undefined) {
+        ErrorResponse.message = 'Something went wrong';
+        ErrorResponse.error = new AppError(
+            ['User Id is missing in the incoming request'],
+            StatusCodes.BAD_REQUEST
+        );
+
+        return res.status(StatusCodes.BAD_REQUEST).json(ErrorResponse);
+    }
+
+    if (req.body.role === undefined) {
+        ErrorResponse.message = 'Something went wrong';
+        ErrorResponse.error = new AppError(
+            ['Role name is missing in the incoming request']
+        );
+    }
+
+    next();
+}
+
 async function validateUser(req, res, next) {
     try {
         // isAuthenticated fn will return id (primary key), if authenticated
@@ -71,9 +92,32 @@ async function validateUser(req, res, next) {
     }
 }
 
+async function isAdmin(req, res, next) {
+    try {
+        // the req.userId is set by the above validateUser function
+        const response = await UserService.isAdmin(req.userId);
+
+        if (!response) {
+            ErrorResponse.message = 'Something went wrong';
+            ErrorResponse.error = new AppError(
+                'User is not authorized to perform such action',
+                StatusCodes.UNAUTHORIZED
+            );
+
+            return res.status(StatusCodes.UNAUTHORIZED).json(ErrorResponse);
+        }
+
+        next();
+    } catch (error) {
+        ErrorResponse.error = error; // this error object is (AppError) object
+        return res.status(error.statusCode).json(ErrorResponse);
+    }
+}
 
 module.exports = {
     validateSignupRequest,
     validateSigninRequest,
-    validateUser
+    validateUser,
+    validateAddRoleToUserRequest,
+    isAdmin
 }
