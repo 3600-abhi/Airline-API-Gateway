@@ -30,7 +30,7 @@ router.get(
 /** 
  * PATCH: /api/v1/users/role
 */
-router.post(
+router.patch(
     '/role',
     UserMiddlewares.validateAddRoleToUserRequest,
     UserMiddlewares.validateUser,

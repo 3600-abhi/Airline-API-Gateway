@@ -15,11 +15,11 @@ function validatePassword(plainPassword, encryptedPassword) {
 }
 
 
-function createToken(input) {
+function createToken(data) {
     try {
         // when we will verify the generated token using jwt.verify() fn
         // we will get this input object as response
-        return jwt.sign(input, ServerConfig.JWT_SECRET, { expiresIn: ServerConfig.JWT_EXPIRY });
+        return jwt.sign(data, ServerConfig.JWT_SECRET, { expiresIn: ServerConfig.JWT_EXPIRY });
     } catch (error) {
         throw new AppError('Cannot generate token', StatusCodes.INTERNAL_SERVER_ERROR);
     }
