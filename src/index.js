@@ -20,17 +20,38 @@ app.use(limiter);
 
 
 // Implementing Reverse-Proxy for Flight-Services
+
+const flightServiceOptions = {
+  target: ServerConfig.FLIGHT_SERVICE,
+  changeOrigin: true,
+  pathRewrite: {
+    '^/flightservice/api/v1': '/api/v1'
+  }
+};
+
 app.use(
   '/flightservice',
-  createProxyMiddleware({ target: ServerConfig.FLIGHT_SERVICE, changeOrigin: true })
+  createProxyMiddleware(flightServiceOptions)
 );
+
+// ..........................................
 
 
 // Implementing Reverse-Proxy for Boking-Services
+const bookingServiceOptions = {
+  target: ServerConfig.BOOKING_SERVICE,
+  changeOrigin: true,
+  pathRewrite: {
+    '^/bookingservice/api/v1': '/api/v1'
+  }
+}
+
 app.use(
   '/bookingservice',
-  createProxyMiddleware({ target: ServerConfig.BOOKING_SERVICE, changeOrigin: true })
+  createProxyMiddleware(bookingServiceOptions)
 );
+
+// .......................................
 
 
 app.use('/api', apiRoutes);
